@@ -1,6 +1,9 @@
 class DownloadManager
 
-  def self.ignore_file?(name)
+  # Determines if the file should be ignored. IgnoredFile if
+  # the file should be ignored and nil if it needs to be
+  # processed.
+  def self.ignore_file?( name )
 
     if not is_video_or_first_rar( name )
       ignore = IgnoredFile.new
@@ -27,6 +30,9 @@ class DownloadManager
     return nil
   end
 
+  # Checks if the file is not a video file or the first
+  # rar file in a group of rar files. (eg. .rar, .r00 when
+  # there is no .rar or .r01 when there is no .r00 or rar
   def self.is_video_or_first_rar( path )
     # Check if it is a video file
     video_exts = %w[avi mov mp4 mkv mpg wmv mpeg]
@@ -84,7 +90,7 @@ class DownloadManager
         end
 
         # Otherwise try and match the file
-        file_result = match_file(file)
+        file_result = match_file( file )
         if file_result.match_type == :movie
           result.movie_matches.push( file_result )
           result.items_with_matches.add( download )
@@ -125,7 +131,7 @@ class DownloadManager
 
     # Match episode of the form Title.S01E01
     show_regex1 = /.*\/(#{title_chars}+)S(\d\d)E(\d\d)/i
-    if show_regex1.match(file_path)
+    if show_regex1.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
       return result
@@ -133,7 +139,7 @@ class DownloadManager
 
     # Match episode of the form Title.01x01
     show_regex2 = /.*\/(#{title_chars}+)(\d\d)x(\d\d)/i
-    if show_regex2.match(file_path)
+    if show_regex2.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
       return result
@@ -154,7 +160,7 @@ class DownloadManager
   def self.fix_title( title )
     # Ignore specific words
     ignore_words = %w[xvid divx bluray dvdrip brrip uncut unrated]
-    ignore_words.each { |word| title.gsub!(/#{word}/i, "") }
+    ignore_words.each { |word| title.gsub!( /#{word}/i, "" ) }
     # Convert spaces and underscores to dots
     title.gsub!( /[_\s]/, ".")
     # Remove trailing and leading dots
@@ -163,7 +169,7 @@ class DownloadManager
     # Remove duplicate dots
     title.sub!( /\.\.+/, ".")
     # Make first character of every word uppercase
-    title = title.split('.').map {|w| w.capitalize}.join('.')
+    title = title.split('.').map {|w| w.capitalize}.join( '.' )
     return title
   end
 
