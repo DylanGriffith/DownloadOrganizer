@@ -1,3 +1,5 @@
+require 'fileutils'
+
 class DownloadManager
 
   # Determines if the file should be ignored. IgnoredFile if
@@ -38,6 +40,7 @@ class DownloadManager
     video_exts = %w[avi mov mp4 mkv mpg wmv mpeg]
     video_exts.each do |ext|
       if path =~ /\.#{ext}$/i
+        #puts "\nFound video: #{path}\n"
         return true
       end
     end
@@ -63,11 +66,15 @@ class DownloadManager
     return false
   end
 
+  def self.escape_glob( s )
+    s.gsub(/[\\\{\}\[\]\*\?]/) { |x| "\\" + x }
+  end
+
   # Searches the directory defined by downloads_dir
   # and attempts to classify the files within it
-  def self.search_dir( downloads_dir )
+  def self.search_dir( downloads_dir, find_latest_match = true )
     result = SearchResult.new
-    downloads = Dir.glob( downloads_dir + '/*' )
+    downloads = Dir.glob( escape_glob( downloads_dir ) + '/*' )
     downloads.each do |download|
       download.gsub!( /\/\/+/, "/" )
       files_matched = 0
@@ -75,7 +82,7 @@ class DownloadManager
         files = Array.new
         files.push( download )
       else
-        files = Dir.glob( download + '/**/*' )
+        files = Dir.glob( escape_glob( download ) + '/**/*' )
       end
 
       # Go through all files
@@ -90,7 +97,7 @@ class DownloadManager
         end
 
         # Otherwise try and match the file
-        file_result = match_file( file )
+        file_result = match_file( file, find_latest_match )
         if file_result.match_type == :movie
           result.movie_matches.push( file_result )
           result.items_with_matches.add( download )
@@ -105,21 +112,166 @@ class DownloadManager
     return result
   end
 
+  def self.staging_dir
+    "staging"
+  end
+
+  # Handle all of the video files by moving (and renaming) them
+  # to the appropriate folders. All rar files in the +search_result+
+  # will just be skipped.
+  def self.process_result_videos_only( search_result, movies_dir, shows_dir, overwrite = false, delete = false )
+
+    ###############  Move all of the movies  ###############
+    search_result.movie_matches.each do |movie_file_result|
+      path = movie_file_result.file_path
+
+      # Skip rar files for now
+      if path =~ /\.rar/ or path =~ /\.r\d\d$/
+        next
+      end
+
+      new_name = movie_file_result.final_match.title + ".(" + movie_file_result.final_match.year.to_s + ")" 
+      ext = File.extname movie_file_result.file_path
+      final_path = File.join movies_dir, new_name, ( new_name + ext )
+
+      # Skip file if it already exists and overwrite is disabled
+      if File.file? final_path and not overwrite
+        next
+      end
+
+      # Make directory if it doesnt already exist
+      directory = File.join movies_dir, new_name
+      Dir.mkdir( directory ) unless File.exists?( directory )
+
+      # Move file to the directory
+      if delete
+        File.rename path, final_path
+      else
+        FileUtils.cp path, final_path
+      end
+    end
+
+    ###############  Move all of the episodes  ###############
+    search_result.episode_matches.each do |episode_file_result|
+      path = episode_file_result.file_path
+
+      # Skip rar files for now
+      if path =~ /\.rar/ or path =~ /\.r\d\d$/
+        next
+      end
+
+      title = episode_file_result.final_match.title
+      season = episode_file_result.final_match.season.to_s.rjust( 2, '0' )
+      episode = episode_file_result.final_match.episode.to_s.rjust( 2, '0' )
+      ext = File.extname path
+      show_directory = File.join shows_dir, title
+      season_directory = File.join show_directory, "Season#{season}"
+      final_path = File.join season_directory, "#{title}.S#{season}E#{episode}#{ext}"
+
+      # Skip if episode already exists and overwrite is disabled
+      if File.file? final_path and not overwrite
+        next
+      end
+
+      # Create show directory if needed
+      Dir.mkdir( show_directory ) unless File.exist?( show_directory )
+
+      # Create season directory if needed
+      Dir.mkdir( season_directory ) unless File.exist?( season_directory )
+
+      # Move the file to the directory
+      if delete
+        File.rename path, final_path
+      else
+        FileUtils.cp path, final_path
+      end
+    end
+
+  end
+
   # Processes all of the results defined in the +search_result+
   # (which you can get from the DownloadManager.search_dir 
   # method) and moves files to the directories defined by
   # +movies_dir+ and +shows_dir+ where appropriate.
-  def self.process_result( search_result, movies_dir, shows_dir )
+  def self.process_result( search_result, movies_dir, shows_dir, overwrite = false, delete = false )
+
+    # Process the video files only
+    process_result_videos_only( search_result, movies_dir, shows_dir, overwrite, delete )
+
+    # Extract rar files to the staging area
+    process_rars_to_staging( search_result )
+
+    # Match video files in the staging area and
+    # move to the final destinations
+    stag_dir = staging_dir()
+    ser_res = search_dir( stag_dir, false )
+    process_result_videos_only( ser_res, movies_dir, shows_dir, overwrite, true )
+
+    # Delete all of the downloads with something found in them if delete == true
+
+  end
+
+  # Extracts all of the rars to the staging area in identifying directories
+  def self.process_rars_to_staging( search_result )
+
+    # Make sure the staging directory is empty to begin with
+    FileUtils.rm_rf staging_dir()
+    Dir.mkdir staging_dir()
+
+    # Process movies
+    search_result.movie_matches.each do |movie_file_result|
+      path = movie_file_result.file_path
+      if path =~ /\.rar/ or path =~ /\.r\d\d$/
+        title = movie_file_result.final_match.title
+        year = movie_file_result.final_match.year
+        dir = File.join( staging_dir(), "#{title}.#{year}" )
+        Dir.mkdir( dir )
+        dir = dir + "/"
+        safe_path = make_safe_path( path )
+        system( "unrar x -o- #{safe_path} #{dir} > /dev/null")
+      end
+    end
+
+    # Process episodes
+    search_result.episode_matches.each do |episode_file_result|
+      path = episode_file_result.file_path
+      if path =~ /\.rar/ or path =~ /\.r\d\d$/
+        title = episode_file_result.final_match.title
+        season = episode_file_result.final_match.season.to_s.rjust( 2, '0' )
+        episode = episode_file_result.final_match.episode.to_s.rjust( 2, '0' )
+        dir = File.join( staging_dir(), "#{title}.S#{season}E#{episode}" )
+        Dir.mkdir( dir )
+        dir = dir + "/"
+        safe_path = make_safe_path( path )
+        system( "unrar x -o- #{safe_path} #{dir} > /dev/null")
+      end
+    end
+
+  end
+
+  def self.make_safe_path( path )
+    result = path.gsub( /([ ()])/, '\\1' )
+  end
+
+  # Unrars the rar file to the staging area in
+  # a directory which fully specifies the content
+  def process_rar_file( file_result, staging_dir )
+
+    # Create the directory in the staging area for the file
+
+    # Delete all but the first video file found
+
+    # Rename the video file to 'video.ext'
+
   end
 
   # Used to match an individual file as either a movie or tv 
   # show episode
-  def self.match_file( file_path )
+  def self.match_file( file_path, find_latest_match = true  )
     result = FileResult.new
     result.file_path = file_path
     result.match_type = :unknown
     result.final_match = :unknown
-
 
     # Regexes assume all file paths contain a '/'
     if not file_path.starts_with? "/" 
@@ -129,8 +281,16 @@ class DownloadManager
     # Regex helpers
     title_chars = '[.\w\s\-]'
 
+    # Needed at the start of the regex if you want to match
+    # as late as possible, otherwise first match is used
+    if find_latest_match
+      match_late = '.*\/'
+    else
+      match_late = "";
+    end
+
     # Match episode of the form Title.S01E01
-    show_regex1 = /.*\/(#{title_chars}+)S(\d\d)E(\d\d)/i
+    show_regex1 = /#{match_late}(#{title_chars}+)S(\d\d)E(\d\d)/i
     if show_regex1.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
@@ -138,7 +298,7 @@ class DownloadManager
     end
 
     # Match episode of the form Title.01x01
-    show_regex2 = /.*\/(#{title_chars}+)(\d\d)x(\d\d)/i
+    show_regex2 = /#{match_late}(#{title_chars}+)(\d\d)x(\d\d)/i
     if show_regex2.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
@@ -146,7 +306,7 @@ class DownloadManager
     end
 
     # Match movie of the form Title.2012 or Title.(2012) or Title.[2012]
-    movie_regex1 = /.*\/(#{title_chars}+)[\(\[]?(\d\d\d\d)[\]\)]?/i
+    movie_regex1 = /#{match_late}(#{title_chars}+)[\(\[]?(\d\d\d\d)[\]\)]?/i
     if movie_regex1.match( file_path )
       result.match_type = :movie
       result.final_match = Movie.new
@@ -191,7 +351,7 @@ class SearchResult
     @items_with_matches = Set.new
   end
 
-    # Files matched as episodes. Array of FileResult
+  # Files matched as episodes. Array of FileResult
   attr_accessor :episode_matches
 
   # Files matched as movies. Array of FileResult

@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'download_manager'
+require 'fileutils'
 
 class DownloadManagerTest < ActiveSupport::TestCase
 
@@ -94,7 +95,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal 2013, result.final_match.year
   end
 
-  path4 = "path/to/Jack.Reacher.unrated.2013.mp4"
+  path4 = "path/to/jack.reacher.unrated.2013.mp4"
   test "#{path4} test" do
     result = DownloadManager.match_file(path4)
     assert_equal :movie, result.match_type
@@ -136,7 +137,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
 
   # Downloads directory search test
   test "search_dir_test_1" do
-    downloads_dir = "test/resources/test1/"
+    downloads_dir = "test/resources/test1/downloads/"
     result = DownloadManager.search_dir( downloads_dir )
     episode_matches = result.episode_matches
     movie_matches = result.movie_matches
@@ -159,7 +160,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
       assert_equal "test/resources/test1/downloads/The Dark Knight/The Dark Knight [2010].mkv", movie_matches[0].file_path
       assert_equal "test/resources/test1/downloads/Jack.Reacher.(2013).avi", movie_matches[1].file_path
     else
-      assert false
+      assert false, "First match was neither dark knight nor jack reacher"
     end
 
     # Episode matches
@@ -184,5 +185,110 @@ class DownloadManagerTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # Downloads directory search test
+  test "search_dir_test_2" do
+    downloads_dir = "test/resources/test2/downloads/"
+    result = DownloadManager.search_dir( downloads_dir )
+    episode_matches = result.episode_matches
+    movie_matches = result.movie_matches
+    ignored_files = result.ignored_files
+    unknown_files = result.unknown_files
+    items_with_matches = result.items_with_matches
+
+    assert_equal 1, movie_matches.length
+    assert_equal 34, episode_matches.length
+    assert_equal 4, items_with_matches.length
+  end
+
+  # Test processing directory
+  test "process_result_test_3_vids_only" do
+    test_dir = File.join "test", "resources", "test3"
+    downloads_dir = File.join test_dir, "downloads"
+    movies_dir = File.join test_dir, "movies"
+    shows_dir = File.join test_dir, "shows"
+    FileUtils.rm_rf movies_dir
+    FileUtils.rm_rf shows_dir
+    Dir.mkdir movies_dir
+    Dir.mkdir shows_dir
+    search_result = DownloadManager.search_dir( downloads_dir )
+    DownloadManager.process_result( search_result, movies_dir, shows_dir )
+
+    assert_equal 2, search_result.movie_matches.length, "Wrong number of movies found"
+    assert_equal 1, search_result.episode_matches.length, "Wrong number of episodes found"
+
+    assert File.directory?( File.join( movies_dir, "The.Dark.Knight.(2010)")), "Dark Knight folder doesn't exist"
+    assert File.file?( File.join( movies_dir, "The.Dark.Knight.(2010)", "The.Dark.Knight.(2010).mkv")), "Dark Knight movie doesnt exist"
+
+    assert File.directory?( File.join( movies_dir, "Jack.Reacher.(2013)")), "Jack Reacher folder doesnt exist"
+    assert File.file?( File.join( movies_dir, "Jack.Reacher.(2013)", "Jack.Reacher.(2013).avi")), "Jack Reacher movie doesnt exist"
+
+    assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
+  end
+
+  # Test processing directory with rars
+  test "process_result_test_4_rars_only" do
+    test_dir = File.join "test", "resources", "test4"
+    downloads_dir = File.join test_dir, "downloads"
+    movies_dir = File.join test_dir, "movies"
+    shows_dir = File.join test_dir, "shows"
+    FileUtils.rm_rf movies_dir
+    FileUtils.rm_rf shows_dir
+    Dir.mkdir movies_dir
+    Dir.mkdir shows_dir
+    search_result = DownloadManager.search_dir( downloads_dir )
+    DownloadManager.process_result( search_result, movies_dir, shows_dir )
+
+    assert_equal 2, search_result.movie_matches.length, "Wrong number of movies found"
+    assert_equal 1, search_result.episode_matches.length, "Wrong number of episodes found"
+
+    assert File.directory?( File.join( movies_dir, "The.Dark.Knight.(2010)")), "Dark Knight folder doesn't exist"
+    assert File.file?( File.join( movies_dir, "The.Dark.Knight.(2010)", "The.Dark.Knight.(2010).mkv")), "Dark Knight movie doesnt exist"
+
+    assert File.directory?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)")), "Willy Wonka folder doesnt exist"
+    assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).mkv")), "Willy Wonka movie doesnt exist"
+
+    assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season02" )), "Hustle season 2 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"
+  end
+
+  # Test processing directory with rars
+  test "process_result_test_5_rars_and_videos" do
+    test_dir = File.join "test", "resources", "test5"
+    downloads_dir = File.join test_dir, "downloads"
+    movies_dir = File.join test_dir, "movies"
+    shows_dir = File.join test_dir, "shows"
+    FileUtils.rm_rf movies_dir
+    FileUtils.rm_rf shows_dir
+    Dir.mkdir movies_dir
+    Dir.mkdir shows_dir
+    search_result = DownloadManager.search_dir( downloads_dir )
+    DownloadManager.process_result( search_result, movies_dir, shows_dir )
+
+    assert_equal 3, search_result.movie_matches.length, "Wrong number of movies found"
+    assert_equal 2, search_result.episode_matches.length, "Wrong number of episodes found"
+
+    assert File.directory?( File.join( movies_dir, "The.Dark.Knight.(2010)")), "Dark Knight folder doesn't exist"
+    assert File.file?( File.join( movies_dir, "The.Dark.Knight.(2010)", "The.Dark.Knight.(2010).mkv")), "Dark Knight movie doesnt exist"
+
+    assert File.directory?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)")), "Willy Wonka folder doesnt exist"
+    assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).mkv")), "Willy Wonka movie doesnt exist"
+
+    assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season02" )), "Hustle season 2 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"    
+
+    assert File.directory?( File.join( movies_dir, "Jack.Reacher.(2013)")), "Jack Reacher folder doesnt exist"
+    assert File.file?( File.join( movies_dir, "Jack.Reacher.(2013)", "Jack.Reacher.(2013).avi")), "Jack Reacher movie doesnt exist"
+
+    assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
+ 
+  end
+
 
 end
