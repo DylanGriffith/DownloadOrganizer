@@ -69,6 +69,22 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal 4, result.final_match.episode
   end
 
+  test "Match last test" do
+    result = DownloadManager.match_file("path/The Simpsons 12x01/the simpsons 13x04 720p xvid.extra.stuff.mkv")
+    assert_equal :episode, result.match_type
+    assert_equal "The.Simpsons", result.final_match.title
+    assert_equal 13, result.final_match.season
+    assert_equal 4, result.final_match.episode
+  end
+
+  test "Match first test" do
+    result = DownloadManager.match_file("path/The Simpsons 12x01/the simpsons 13x04 720p xvid.extra.stuff.mkv", false )
+    assert_equal :episode, result.match_type
+    assert_equal "The.Simpsons", result.final_match.title
+    assert_equal 12, result.final_match.season
+    assert_equal 1, result.final_match.episode
+  end
+
   # Movie Tests
 
   path1 = "path/to/Jack Reacher 2013.mp4"
@@ -287,8 +303,5 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
     assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
     assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
- 
   end
-
-
 end
