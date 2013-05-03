@@ -130,9 +130,10 @@ class DownloadManager
         next
       end
 
-      new_name = movie_file_result.final_match.title + ".(" + movie_file_result.final_match.year.to_s + ")" 
+      dir_name = movie_file_result.final_match.dir_name
+      out_file_name = movie_file_result.final_match.out_file_name
       ext = File.extname movie_file_result.file_path
-      final_path = File.join movies_dir, new_name, ( new_name + ext )
+      final_path = File.join movies_dir, dir_name, ( out_file_name + ext )
 
       # Skip file if it already exists and overwrite is disabled
       if File.file? final_path and not overwrite
@@ -140,7 +141,7 @@ class DownloadManager
       end
 
       # Make directory if it doesnt already exist
-      directory = File.join movies_dir, new_name
+      directory = File.join movies_dir, dir_name
       Dir.mkdir( directory ) unless File.exists?( directory )
 
       # Move file to the directory
@@ -160,13 +161,10 @@ class DownloadManager
         next
       end
 
-      title = episode_file_result.final_match.title
-      season = episode_file_result.final_match.season.to_s.rjust( 2, '0' )
-      episode = episode_file_result.final_match.episode.to_s.rjust( 2, '0' )
       ext = File.extname path
-      show_directory = File.join shows_dir, title
-      season_directory = File.join show_directory, "Season#{season}"
-      final_path = File.join season_directory, "#{title}.S#{season}E#{episode}#{ext}"
+      show_directory = File.join shows_dir, episode_file_result.final_match.show_dir_name
+      season_directory = File.join show_directory, episode_file_result.final_match.season_dir_name
+      final_path = File.join season_directory, "#{episode_file_result.final_match.episode_name}#{ext}"
 
       # Skip if episode already exists and overwrite is disabled
       if File.file? final_path and not overwrite
@@ -314,6 +312,14 @@ class DownloadManager
       result.final_match.year = $2.to_i
     end
 
+    # Match movie in multipart files
+    if result.match_type == :movie
+      cd_regex = /cd(\d)/i
+      if cd_regex.match( file_path )
+        result.final_match.cd_num = $1.to_i
+      end
+    end
+
     return result
   end
 
@@ -375,11 +381,44 @@ class IgnoredFile
 end
 
 class Movie
-  attr_accessor :title, :year
+  attr_accessor :title, :year, :cd_num
+
+  def dir_name()
+    return "#{@title}.(#{@year})"
+  end
+
+  def out_file_name()
+    if @cd_num == 0
+      return dir_name()
+    else
+      return "#{@title}.(#{@year}).cd#{@cd_num}"
+    end
+  end
+
+  def initialize()
+    @cd_num = 0 # Zero indicates that it is not a multipart movie file
+  end
+
 end
 
 class Episode
   attr_accessor :title, :season, :episode
+
+  def show_dir_name()
+    return @title
+  end
+
+  def season_dir_name()
+    season = @season.to_s.rjust( 2, '0' )
+    return "Season#{season}"
+  end
+
+  def episode_name()
+    season = @season.to_s.rjust( 2, '0' )
+    episode = @episode.to_s.rjust( 2, '0' )
+    return "#{@title}.S#{season}E#{episode}"
+  end
+
   def self.get_episode_from_details(title, season_number, episode_number)
     new_episode = Episode.new
     new_episode.title = title

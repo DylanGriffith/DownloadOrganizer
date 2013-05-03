@@ -93,6 +93,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path2 = "path/to/Jack.Reacher.2013.mp4"
@@ -101,6 +102,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path3 = "path/to/Jack_Reacher_2013.mp4 (underscores)"
@@ -109,6 +111,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path4 = "path/to/jack.reacher.unrated.2013.mp4"
@@ -117,6 +120,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path5 = "path/to/Jack.Reacher.xvid.2013.mp4"
@@ -125,6 +129,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path6 = "path/to/Jack.Reacher.uncut.BrRip.bluray.DvDRiP.divx.xvid.2013.mp4"
@@ -133,6 +138,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path7 = "path/to/Jack.Reacher.uncut.BrRip.bluray.DvDRiP.divx.xvid.(2013).mp4"
@@ -141,6 +147,7 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
   end
 
   path8 = "path/to/Jack.Reacher.uncut.BrRip.bluray.DvDRiP.divx.xvid.[2013].mp4"
@@ -149,6 +156,25 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
     assert_equal 2013, result.final_match.year
+    assert_equal 0, result.final_match.cd_num
+  end
+
+  path9 = "path/to/Jack.Reacher.[2013].cd1.rar"
+  test "#{path9} test" do
+    result = DownloadManager.match_file(path9)
+    assert_equal :movie, result.match_type
+    assert_equal "Jack.Reacher", result.final_match.title
+    assert_equal 2013, result.final_match.year
+    assert_equal 1, result.final_match.cd_num
+  end
+
+  path10 = "path/cd2/Jack.Reacher.[2013].rar"
+  test "#{path10} test" do
+    result = DownloadManager.match_file(path10)
+    assert_equal :movie, result.match_type
+    assert_equal "Jack.Reacher", result.final_match.title
+    assert_equal 2013, result.final_match.year
+    assert_equal 2, result.final_match.cd_num
   end
 
   # Downloads directory search test
@@ -304,4 +330,31 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
     assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
   end
+
+  # Test processing multipart movies
+  test "process_result_test_7_multipart_movies" do
+    test_dir = File.join "test", "resources", "test6"
+    downloads_dir = File.join test_dir, "downloads"
+    movies_dir = File.join test_dir, "movies"
+    shows_dir = File.join test_dir, "shows"
+    FileUtils.rm_rf movies_dir
+    FileUtils.rm_rf shows_dir
+    Dir.mkdir movies_dir
+    Dir.mkdir shows_dir
+    search_result = DownloadManager.search_dir( downloads_dir )
+    DownloadManager.process_result( search_result, movies_dir, shows_dir )
+
+    assert_equal 4, search_result.movie_matches.length, "Wrong number of movies found"
+    assert_equal 0, search_result.episode_matches.length, "Wrong number of episodes found"
+
+    assert File.directory?( File.join( movies_dir, "The.Dark.Knight.(2010)")), "Dark Knight folder doesn't exist"
+    assert File.file?( File.join( movies_dir, "The.Dark.Knight.(2010)", "The.Dark.Knight.(2010).cd1.avi")), "Dark Knight movie cd1 doesnt exist"
+    assert File.file?( File.join( movies_dir, "The.Dark.Knight.(2010)", "The.Dark.Knight.(2010).cd2.avi")), "Dark Knight movie cd2 doesnt exist"
+
+    assert File.directory?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)")), "Willy Wonka folder doesnt exist"
+    assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).cd1.avi")), "Willy Wonka movie cd1 doesnt exist"
+    assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).cd2.avi")), "Willy Wonka movie cd2 doesnt exist"
+
+  end
+
 end

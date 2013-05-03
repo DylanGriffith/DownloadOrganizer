@@ -1,0 +1,6 @@
+<%
+require 'json'
+path = 'test/resources/test5/downloads'
+search_result = DownloadManager.search_dir path
+%>
+<%== search_result.to_json %>
