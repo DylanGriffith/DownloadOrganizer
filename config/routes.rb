@@ -1,4 +1,9 @@
 DownloadOrganizer::Application.routes.draw do
+
+  post "process/execute"
+
+  post "files/process"
+
   get "files/show"
 
   get "home/index"
