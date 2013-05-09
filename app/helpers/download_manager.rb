@@ -349,7 +349,9 @@ end
 # directory for episodes and movies
 class SearchResult
 
-  # Constructor to use when paramaters come from JSON object
+  # Constructor to use when paramaters come from JSON object. 
+  # All arguments should hashes from JSON or give no arguments
+  # if you just want a new empty SearchResult
   def initialize( episode_matches = Array.new, movie_matches = Array.new, ignored_files = Array.new, unknown_files = Array.new, items_with_matches = Set.new )
     @episode_matches = Array.new
     @movie_matches = Array.new
@@ -383,6 +385,7 @@ class SearchResult
       movie_match.final_match = Movie.new
       movie_match.final_match.title = mov[:final_match][:title]
       movie_match.final_match.year = mov[:final_match][:year].to_i
+      movie_match.final_match.cd_num = mov[:final_match][:cd_num].to_i
       @movie_matches.push movie_match
     end
 
