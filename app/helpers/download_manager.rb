@@ -288,7 +288,7 @@ class DownloadManager
     end
 
     # Match episode of the form Title.S01E01
-    show_regex1 = /#{match_late}(#{title_chars}+)S(\d\d)E(\d\d)/i
+    show_regex1 = /#{match_late}(\w#{title_chars}+)S(\d\d)E(\d\d)/i
     if show_regex1.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
@@ -296,7 +296,7 @@ class DownloadManager
     end
 
     # Match episode of the form Title.01x01
-    show_regex2 = /#{match_late}(#{title_chars}+)(\d\d)x(\d\d)/i
+    show_regex2 = /#{match_late}(\w#{title_chars}+)(\d\d)x(\d\d)/i
     if show_regex2.match( file_path )
       result.match_type = :episode
       result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i )
@@ -304,7 +304,7 @@ class DownloadManager
     end
 
     # Match movie of the form Title.2012 or Title.(2012) or Title.[2012]
-    movie_regex1 = /#{match_late}(#{title_chars}+)[\(\[]?(\d\d\d\d)[\]\)]?/i
+    movie_regex1 = /#{match_late}(\w#{title_chars}+)[\(\[]?(\d\d\d\d)[\]\)]?/i
     if movie_regex1.match( file_path )
       result.match_type = :movie
       result.final_match = Movie.new
