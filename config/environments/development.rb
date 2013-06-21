@@ -34,4 +34,9 @@ DownloadOrganizer::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Settings for downloads directories
+  config.downloads_dir = 'test/resources/test5/downloads'
+  config.movies_dir = 'test/resources/test5/movies'
+  config.shows_dir = 'test/resources/test5/shows'
 end

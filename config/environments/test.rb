@@ -34,4 +34,9 @@ DownloadOrganizer::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  # Settings for downloads directories
+  config.downloads_dir = 'test/resources/test5/downloads'
+  config.movies_dir = 'test/resources/test5/movies'
+  config.shows_dir = 'test/resources/test5/shows'
 end

@@ -10,8 +10,8 @@ class ProcessController < ApplicationController
       unknown_files = params[:unknown_files]
       items_with_matches = params[:items_with_matches]
       search_result = SearchResult.new( episode_matches, movie_matches, ignored_files, unknown_files, items_with_matches )
-      movies_dir = 'test/resources/test5/movies'
-      shows_dir = 'test/resources/test5/shows'
+      movies_dir = DownloadOrganizer::Application.config.movies_dir
+      shows_dir = DownloadOrganizer::Application.config.shows_dir
       DownloadManager.process_result( search_result, movies_dir, shows_dir )
     end
   end
