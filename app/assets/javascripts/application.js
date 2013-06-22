@@ -12,6 +12,14 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require underscore
+//= require backbone
+//= require main
 //= require_tree .
 //
 
+window.onload = function() {
+    new DownloadOrganizer.TopPanelView({
+        el: $('#top-panel')
+    })
+}

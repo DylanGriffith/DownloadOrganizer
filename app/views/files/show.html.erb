@@ -1,36 +1,4 @@
-
-<div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="brand" href="#">Download Organizer</a>
-      <div class="nav-collapse collapse">
-        <ul class="nav">
-          <li class="active"><a href="/files/show">Downloads</a></li>
-          <li><a href="/settings">Settings</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
+<%= render :partial => 'common/top_panel' %>
 <br/>
 <br/>
-<div class="container">
-
-  <br/>
-  <h1 class="pull-left">Downloads</h1>
-  <a class="pull-right btn btn-primary btn-large" href="javascript:;" onclick="FilesManager.searchFiles();">Search Downloads</a>
-
-  <br/>
-  <br/>
-  <br/>
-  <div id="filesSection" class="hero-unit hide">
-
-  </div>
-
-</div> <!-- /container -->
+<%= render :partial => 'view_files' %>
