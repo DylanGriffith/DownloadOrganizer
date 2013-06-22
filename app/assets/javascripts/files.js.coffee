@@ -31,7 +31,7 @@ window.FilesManager = class FilesManager
       procLink = document.createElement("p")
       procLink.innerHTML = "<a class=\"pull-right btn btn-primary btn-large\" href=\"javascript:;\" onclick=\"FilesManager.processResult();\">Process Result</a>"
       filesDiv.appendChild procLink
-      $(filesDiv).toggleClass "hide"
+      $(filesDiv).toggleClass "hide", false
     ).fail (jqxhr, textStatus, error) ->
       err = textStatus + ", " + error
       console.log "Request Failed: " + err
