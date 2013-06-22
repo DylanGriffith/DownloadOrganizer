@@ -71,8 +71,9 @@ function searchFiles() {
             searchResult = json;
 
             var procLink = document.createElement( 'p' );
-            procLink.innerHTML = '<a href="javascript:;" onclick="processResult();">Process Result</a>';
+            procLink.innerHTML = '<a class="pull-right btn btn-primary btn-large" href="javascript:;" onclick="processResult();">Process Result</a>';
             filesDiv.appendChild( procLink );
+            $( filesDiv ).toggleClass( 'hide' );
 
         })
     .fail(function( jqxhr, textStatus, error ) {

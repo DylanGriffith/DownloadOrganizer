@@ -19,3 +19,7 @@
 
 # Ignore database config
 /config/database.yml
+
+# Ignore results of test
+test/resources/test4/shows/*
+test/resources/test4/movies/*
