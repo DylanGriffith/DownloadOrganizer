@@ -1,6 +1,7 @@
 <%
 require 'json'
+require 'download_manager'
 path = DownloadOrganizer::Application.config.downloads_dir
-search_result = DownloadManager.search_dir path
+search_result = DownloadOrganization::DownloadManager.search_dir path
 %>
 <%== search_result.to_json %>
