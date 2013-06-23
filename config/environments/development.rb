@@ -36,7 +36,7 @@ DownloadOrganizer::Application.configure do
   config.assets.debug = true
 
   # Settings for downloads directories
-  config.downloads_dir = 'test/resources/test5/downloads'
-  config.movies_dir = 'test/resources/test5/movies'
-  config.shows_dir = 'test/resources/test5/shows'
+  config.downloads_dir = 'test/resources/example/downloads'
+  config.movies_dir = 'test/resources/example/movies'
+  config.shows_dir = 'test/resources/example/shows'
 end

@@ -46,11 +46,12 @@ window.FilesManager = class FilesManager
       epElement = document.createElement("li")
       heading = document.createElement("b")
       heading.innerHTML = episode.title + " - Season " + episode.season + " - Episode " + episode.episode
+      heading.innerHTML += '&' + (Number(episode.episode) + 1) if episode.is_double
       epElement.appendChild heading
       epChild = document.createElement("ul")
       inner = document.createElement("li")
       inner.innerHTML = path
-      epChild.appendChild inner
+      epChild.appendChild inner if episode.is_double
       epElement.appendChild epChild
       epList.appendChild epElement
     return epList
@@ -63,7 +64,7 @@ window.FilesManager = class FilesManager
       movElement = document.createElement("li")
       heading = document.createElement("b")
       heading.innerHTML = movie.title + " - " + movie.year
-      heading.innerHTML += " - cd" + movie.cd_num  if movie.cd_num isnt 0
+      heading.innerHTML += " - cd" + movie.cd_num if movie.cd_num isnt 0
       movElement.appendChild heading
       movChild = document.createElement("ul")
       inner = document.createElement("li")
