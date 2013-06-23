@@ -287,6 +287,18 @@ module DownloadOrganization
         match_late = "";
       end
 
+      # Match double episodes
+      double_episode_patterns = [ 'S(\d\d)E(\d\d)-?E?\d\d',
+                                 '(\d\d)x(\d\d)-?x?\d\d' ]
+      double_episode_patterns.each do |pattern|
+        double_ep_show_regex = /#{match_late}(\w#{title_chars}+)#{pattern}/i
+        if double_ep_show_regex.match( file_path )
+          result.match_type = :episode
+          result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i, true )
+          return result
+        end
+      end
+
       # Match episode of the form Title.S01E01
       show_regex1 = /#{match_late}(\w#{title_chars}+)S(\d\d)E(\d\d)/i
       if show_regex1.match( file_path )
@@ -454,29 +466,41 @@ module DownloadOrganization
   end
 
   class Episode
-    attr_accessor :title, :season, :episode
+    attr_accessor :title, :season, :episode, :is_double
+
+    def double_episode?
+      @is_double
+    end
 
     def show_dir_name()
       return @title
     end
 
     def season_dir_name()
-      season = @season.to_s.rjust( 2, '0' )
+      season = to_s_2_dig(@season)
       return "Season#{season}"
     end
 
     def episode_name()
-      season = @season.to_s.rjust( 2, '0' )
-      episode = @episode.to_s.rjust( 2, '0' )
-      return "#{@title}.S#{season}E#{episode}"
+      season = to_s_2_dig(@season)
+      episode = to_s_2_dig(@episode)
+      "#{@title}.S#{season}E#{episode}" + ( @is_double ? "E#{to_s_2_dig(@episode + 1)}" : '')
     end
 
-    def self.get_episode_from_details(title, season_number, episode_number)
+    def self.get_episode_from_details(title, season_number, episode_number, is_double = false)
       new_episode = Episode.new
       new_episode.title = title
       new_episode.season = season_number
       new_episode.episode = episode_number
+      new_episode.is_double = is_double
       return new_episode
     end
+
+    private 
+
+    def to_s_2_dig(num)
+      num.to_s.rjust( 2, '0')
+    end
+
   end
 end
