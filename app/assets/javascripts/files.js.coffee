@@ -51,7 +51,7 @@ window.FilesManager = class FilesManager
       epChild = document.createElement("ul")
       inner = document.createElement("li")
       inner.innerHTML = path
-      epChild.appendChild inner if episode.is_double
+      epChild.appendChild inner
       epElement.appendChild epChild
       epList.appendChild epElement
     return epList
