@@ -1,7 +1,7 @@
 DownloadOrganizer
 =================
 
-The intention is to create a complete solution to automated identification of downloaded movies and tv shows including moving and organizing the files into the correct directories on your disk. The goal is to have a complete web ui for showing the automated results and to modify misidentifications if necessary. You put this web app on the server you use for downloading files and then you can connect go to this app when you want to move all your new downloads to their correct locations.
+The intention is to create a complete solution to automated identification of downloaded movies and tv shows including moving and organizing the files into the correct directories on your disk. This app is also capable of unraring the rar files you download. The goal is to have a complete web ui for showing the automated results and to modify misidentifications if necessary. You put this web app on the server you use for downloading files and then you can connect go to this app when you want to move all your new downloads to their correct locations.
 
 To run this app first make sure you have rails and rubys setup on your server.
 
