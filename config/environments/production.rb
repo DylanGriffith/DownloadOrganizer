@@ -36,7 +36,7 @@ DownloadOrganizer::Application.configure do
   config.assets.debug = true
 
   settings_file = File.read('config/settings.json')
-  settings = JSON.parse(settings_file)
+  settings = JSON.parse(settings_file).with_indifferent_access
 
   # Settings for downloads directories
   config.downloads_dir = settings[:downloads_dir]
