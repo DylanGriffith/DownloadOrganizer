@@ -146,7 +146,11 @@ module DownloadOrganization
 
         # Move file to the directory
         if delete
-          File.rename path, final_path
+          begin
+            File.rename path, final_path
+          rescue # Rename will fail if they are on different physical disks
+            FileUtils.mv path, final_path
+          end
         else
           FileUtils.cp path, final_path
         end
@@ -316,7 +320,7 @@ module DownloadOrganization
       end
 
       # Match movie of the form Title.2012 or Title.(2012) or Title.[2012]
-      movie_regex1 = /#{match_late}(\w#{title_chars}+)[\(\[]?(\d\d\d\d)[\]\)]?/i
+      movie_regex1 = /#{match_late}(\w#{title_chars}+)[\(\[]?((19|20)\d\d)[\]\)]?/i
       if movie_regex1.match( file_path )
         result.match_type = :movie
         result.final_match = Movie.new

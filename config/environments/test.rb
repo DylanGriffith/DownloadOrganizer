@@ -39,4 +39,8 @@ DownloadOrganizer::Application.configure do
   config.downloads_dir = 'test/resources/test5/downloads'
   config.movies_dir = 'test/resources/test5/movies'
   config.shows_dir = 'test/resources/test5/shows'
+
+  # Credentials
+  config.user_name = "test"
+  config.password = "test"
 end

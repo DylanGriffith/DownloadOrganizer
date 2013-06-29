@@ -26,3 +26,6 @@ test/resources/test4/movies/*
 
 # Ignore the staging directory
 staging/
+
+# Ignore personal settings file
+config/settings.json

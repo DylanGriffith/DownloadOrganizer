@@ -256,13 +256,21 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal 1, result.final_match.cd_num
   end
 
-  path10 = "path/cd2/Jack.Reacher.[2013].rar"
+  path10 = "path/cd2/Jack.Reacher.[1930].rar"
   test "#{path10} test" do
     result = DownloadManager.match_file(path10)
     assert_equal :movie, result.match_type
     assert_equal "Jack.Reacher", result.final_match.title
-    assert_equal 2013, result.final_match.year
+    assert_equal 1930, result.final_match.year
     assert_equal 2, result.final_match.cd_num
+  end
+
+  test "dont match 1080 as movie year test 1" do
+    path = 'path/to/The.Dark.Knight.2012/avil.1080.mkv'
+    result = DownloadManager.match_file(path)
+    assert_equal :movie, result.match_type
+    assert_equal "The.Dark.Knight", result.final_match.title
+    assert_equal 2012, result.final_match.year
   end
 
   # Downloads directory search test

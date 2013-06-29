@@ -1,0 +1,7 @@
+{
+  downloads_dir: "/Volumes/Seagate1TB/torrents/staging/",
+  movies_dir: "/Volumes/Seagate1TB/Videos/movies/", 
+  shows_dir: "/Volumes/Seagate1TB/Videos/shows/",
+  user_name: "foo",
+  password: "bar"
+}
