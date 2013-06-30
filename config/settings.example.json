@@ -1,7 +1,8 @@
 {
-  downloads_dir: "/Volumes/Seagate1TB/torrents/staging/",
-  movies_dir: "/Volumes/Seagate1TB/Videos/movies/", 
-  shows_dir: "/Volumes/Seagate1TB/Videos/shows/",
-  user_name: "foo",
-  password: "bar"
+  "downloads_dir": "/path/to/downloads/",
+  "movies_dir": "/path/to/movies/", 
+  "shows_dir": "/path/to/shows/",
+  "unrar_dir": "/temp/dir/to/unrar_stuff",
+  "user_name": "foo",
+  "password": "bar"
 }
