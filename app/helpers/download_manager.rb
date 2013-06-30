@@ -113,7 +113,7 @@ module DownloadOrganization
     end
 
     def self.staging_dir
-      "staging"
+      DownloadOrganizer::Application.config.unrar_dir
     end
 
     # Handle all of the video files by moving (and renaming) them
