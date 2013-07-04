@@ -40,6 +40,7 @@ DownloadOrganizer::Application.configure do
   config.movies_dir = 'test/resources/example/movies'
   config.shows_dir = 'test/resources/example/shows'
   config.unrar_dir = 'staging'
+  config.ignore_rars = false
 
   # Credentials
   config.user_name = "dev"

@@ -45,7 +45,8 @@ module DownloadOrganization
         end
       end
 
-      return is_first_rar(path)
+      
+      return is_first_rar(path) unless DownloadOrganizer::Application.config.ignore_rars
 
       return false
     end

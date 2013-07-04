@@ -43,6 +43,7 @@ DownloadOrganizer::Application.configure do
   config.movies_dir = settings[:movies_dir]
   config.shows_dir = settings[:shows_dir]
   config.unrar_dir = settings[:unrar_dir]
+  config.ignore_rars = settings[:ignore_rars]
 
   # Credentials
   config.user_name = settings[:user_name]
