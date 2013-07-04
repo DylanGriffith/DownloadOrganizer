@@ -41,6 +41,7 @@ DownloadOrganizer::Application.configure do
   config.shows_dir = 'test/resources/example/shows'
   config.unrar_dir = 'staging'
   config.ignore_rars = false
+  config.overwrite_files = false
 
   # Credentials
   config.user_name = "dev"

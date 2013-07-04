@@ -44,6 +44,7 @@ DownloadOrganizer::Application.configure do
   config.shows_dir = settings[:shows_dir]
   config.unrar_dir = settings[:unrar_dir]
   config.ignore_rars = settings[:ignore_rars]
+  config.overwrite_files = settings[:overwrite_files]
 
   # Credentials
   config.user_name = settings[:user_name]

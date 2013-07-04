@@ -12,7 +12,7 @@ class ProcessController < ApplicationController
       search_result = DownloadOrganization::SearchResult.new( episode_matches, movie_matches, ignored_files, unknown_files, items_with_matches )
       movies_dir = DownloadOrganizer::Application.config.movies_dir
       shows_dir = DownloadOrganizer::Application.config.shows_dir
-      DownloadOrganization::DownloadManager.process_result( search_result, movies_dir, shows_dir )
+      DownloadOrganization::DownloadManager.process_result( search_result, movies_dir, shows_dir, DownloadOrganizer::Application.config.overwrite_files  )
     end
     true
   end
