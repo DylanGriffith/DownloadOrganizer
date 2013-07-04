@@ -5,6 +5,56 @@ include DownloadOrganization
 
 class DownloadManagerTest < ActiveSupport::TestCase
 
+  # Is first rar tests
+  test "rar_test1" do
+    path = 'test/resources/rar_test1/movie.rar'
+    assert_equal true, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test1/movie.r00'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test1/movie.r01'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test1/movie.r02'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test1/movie.r03'
+    assert_equal false, DownloadManager.is_first_rar(path)
+  end
+
+  test "rar_test2" do
+    path = 'test/resources/rar_test2/movie.r00'
+    assert_equal true, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test2/movie.r01'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test2/movie.r02'
+    assert_equal false, DownloadManager.is_first_rar(path)
+  end
+
+  test "rar_test3" do
+    path = 'test/resources/rar_test3/movie.r01'
+    assert_equal true, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test3/movie.r02'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test3/movie.r03'
+    assert_equal false, DownloadManager.is_first_rar(path)
+  end
+
+  test "rar_test4" do
+    path = 'test/resources/rar_test4/movie.part00.rar'
+    assert_equal true, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test4/movie.part01.rar'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test4/movie.part02.rar'
+    assert_equal false, DownloadManager.is_first_rar(path)
+  end
+
+  test "rar_test5" do
+    path = 'test/resources/rar_test5/movie.part01.rar'
+    assert_equal true, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test5/movie.part02.rar'
+    assert_equal false, DownloadManager.is_first_rar(path)
+    path = 'test/resources/rar_test5/movie.part03.rar'
+    assert_equal false, DownloadManager.is_first_rar(path)
+  end
+
   # TV Show tests
   test "Friends.S01E01.mkv test" do
     result = DownloadManager.match_file("Friends.S01E01.mkv")

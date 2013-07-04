@@ -45,22 +45,37 @@ module DownloadOrganization
         end
       end
 
+      return is_first_rar(path)
+
+      return false
+    end
+
+    def self.is_first_rar ( path )
+
+      # Handle the part00.rar, part01.rar types
+      if path =~ /\.part(\d\d).rar/i
+        num = $1
+        return true if (num == '00')
+        if (num == '01')
+          return true unless File.file?( path.sub( /01.rar$/, "00.rar" ) )
+        end
+        return false
+      end
+
+      # Handle the .rar, .r00, r01 types
+
+      return false unless path =~ /\.(rar|r\d\d)$/i
       if path =~ /\.rar$/i
         return true
       end
 
       if path =~ /\.r00$/i
-        if not File.file?( path.sub( /00$/, "ar" ) )
-          return true
-        end
+        return true unless File.file?( path.sub( /00$/, "ar" ) )
       end
 
       if path =~ /\.r01$/i
-        if not File.file?( path.sub( /01$/, "ar" ) )
-          if not File.file?( path.sub( /01$/, "00" ) )
-            return true
-          end
-        end
+        return false if File.file?( path.sub( /01$/, "ar" ) )
+        return true unless File.file?( path.sub( /01$/, "00" ) )
       end
 
       return false
@@ -253,18 +268,6 @@ module DownloadOrganization
 
     def self.make_safe_path( path )
       result = path.gsub( /([ ()])/, '\\1' )
-    end
-
-    # Unrars the rar file to the staging area in
-    # a directory which fully specifies the content
-    def process_rar_file( file_result, staging_dir )
-
-      # Create the directory in the staging area for the file
-
-      # Delete all but the first video file found
-
-      # Rename the video file to 'video.ext'
-
     end
 
     # Used to match an individual file as either a movie or tv 
