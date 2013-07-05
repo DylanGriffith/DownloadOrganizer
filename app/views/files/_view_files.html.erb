@@ -1,13 +1,15 @@
-
-<div class="container">
+<%= render :partial => 'episode_show_template' %>
+<%= render :partial => 'movie_show_template' %>
+<%= render :partial => 'torrent_show_template' %>
+<div class="container" id="files-main-view">
   <br/>
   <div class="row">
-    <a class="span9 btn btn-primary btn-large" href="javascript:;" onclick="FilesManager.searchFiles();">Search Downloads</a>
-    <br/>
-
-    <div id="filesSection" class="span9 hero-unit hide">
+    <a class="span9 btn btn-primary btn-large" id="search-files" href="#">Search Downloads</a>
+  </div>
+  <br/>
+  <div class="row">
+    <div id="files-section" class="span9 hero-unit hide">
 
     </div>
   </div>
-
 </div> <!-- /container -->
