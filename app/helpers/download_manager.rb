@@ -45,7 +45,6 @@ module DownloadOrganization
         end
       end
 
-      
       return is_first_rar(path) unless DownloadOrganizer::Application.config.ignore_rars
 
       return false
@@ -132,13 +131,9 @@ module DownloadOrganization
       DownloadOrganizer::Application.config.unrar_dir
     end
 
-    # Handle all of the video files by moving (and renaming) them
-    # to the appropriate folders. All rar files in the +search_result+
-    # will just be skipped.
-    def self.process_result_videos_only( search_result, movies_dir, shows_dir, overwrite = false, delete = false )
-
+    def self.process_movie_matches( movie_matches, movies_dir, overwrite, delete)
       ###############  Move all of the movies  ###############
-      search_result.movie_matches.each do |movie_file_result|
+      movie_matches.each do |movie_file_result|
         path = movie_file_result.file_path
 
         # Skip rar files for now
@@ -171,9 +166,11 @@ module DownloadOrganization
           FileUtils.cp path, final_path
         end
       end
+    end
 
+    def self.process_episode_matches( episode_matches, shows_dir, overwrite, delete)
       ###############  Move all of the episodes  ###############
-      search_result.episode_matches.each do |episode_file_result|
+      episode_matches.each do |episode_file_result|
         path = episode_file_result.file_path
 
         # Skip rar files for now
@@ -204,6 +201,15 @@ module DownloadOrganization
           FileUtils.cp path, final_path
         end
       end
+    end
+
+    # Handle all of the video files by moving (and renaming) them
+    # to the appropriate folders. All rar files in the +search_result+
+    # will just be skipped.
+    def self.process_result_videos_only( search_result, movies_dir, shows_dir, overwrite = false, delete = false )
+
+      process_movie_matches( search_result.movie_matches, movies_dir, overwrite, delete )
+      process_episode_matches( search_result.episode_matches, shows_dir, overwrite, delete )
 
     end
 
@@ -226,7 +232,16 @@ module DownloadOrganization
       process_result_videos_only( ser_res, movies_dir, shows_dir, overwrite, true )
 
       # Delete all of the downloads with something found in them if delete == true
+      if delete
+        remove_items_with_matches( search_result.items_with_matches )
+      end
 
+    end
+
+    def self.remove_items_with_matches( items_with_matches )
+      items_with_matches.each do |item|
+        FileUtils.rm_rf item
+      end
     end
 
     # Extracts all of the rars to the staging area in identifying directories
