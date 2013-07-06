@@ -1,0 +1,6 @@
+%script{ :type => 'text/template', :id => 'torrent_show_template' }
+  .to-delete-item
+    .item-data
+      .pull-left.path {{path}}
+      %input{ :type => "checkbox", :checked => "checked", :class => "to-delete-checkbox pull-right" }
+
