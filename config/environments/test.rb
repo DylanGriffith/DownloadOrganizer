@@ -42,6 +42,7 @@ DownloadOrganizer::Application.configure do
   config.unrar_dir = 'staging'
   config.ignore_rars = false
   config.overwrite_files = false
+  config.delete_files = false
 
   # Credentials
   config.user_name = "test"

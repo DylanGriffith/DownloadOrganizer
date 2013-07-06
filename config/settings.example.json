@@ -4,5 +4,7 @@
   "shows_dir": "/path/to/shows/",
   "unrar_dir": "/temp/dir/to/unrar_stuff",
   "user_name": "foo",
-  "password": "bar"
+  "password": "bar",
+  "overwrite_files": false,
+  "delete_files": false
 }
