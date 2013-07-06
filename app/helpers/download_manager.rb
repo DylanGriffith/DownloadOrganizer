@@ -222,14 +222,16 @@ module DownloadOrganization
       # Process the video files only
       process_result_videos_only( search_result, movies_dir, shows_dir, overwrite, delete )
 
-      # Extract rar files to the staging area
-      process_rars_to_staging( search_result )
+      unless DownloadOrganizer::Application.config.ignore_rars
+        # Extract rar files to the staging area
+        process_rars_to_staging( search_result )
 
-      # Match video files in the staging area and
-      # move to the final destinations
-      stag_dir = staging_dir()
-      ser_res = search_dir( stag_dir, false )
-      process_result_videos_only( ser_res, movies_dir, shows_dir, overwrite, true )
+        # Match video files in the staging area and
+        # move to the final destinations
+        stag_dir = staging_dir()
+        ser_res = search_dir( stag_dir, false )
+        process_result_videos_only( ser_res, movies_dir, shows_dir, overwrite, true )
+      end
 
       # Delete all of the downloads with something found in them if delete == true
       if delete
@@ -249,7 +251,7 @@ module DownloadOrganization
 
       # Make sure the staging directory is empty to begin with
       FileUtils.rm_rf staging_dir()
-      Dir.mkdir staging_dir()
+      Dir.mkdir staging_dir() unless File.exist?( staging_dir() )
 
       # Process movies
       search_result.movie_matches.each do |movie_file_result|
