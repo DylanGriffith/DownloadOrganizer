@@ -24,6 +24,7 @@ DownloadOrganizer.DownloadManagerView = Backbone.View.extend
     data.items_with_matches = @toBeDeleted()
     data.episode_matches = @episodesToProcess()
     data.movie_matches = @moviesToProcess()
+    @filesDiv().html ""
     $.ajax
       type: "POST"
       url: "/process/execute"
@@ -31,9 +32,9 @@ DownloadOrganizer.DownloadManagerView = Backbone.View.extend
       dataType: "json"
       contentType: "application/json"
       success: =>
-        @filesDiv().innerHtml = @processSuccessMessage
+        @filesDiv().append @processSuccessMessage
       error: =>
-        @filesDiv().innerHtml = @processFailureMessage + @filesDiv.innerHtml
+        @filesDiv().append @processFailureMessage
 
   processSuccessMessage: ->
     '<div class="alert alert-success"><strong>Complete</strong></div>'
