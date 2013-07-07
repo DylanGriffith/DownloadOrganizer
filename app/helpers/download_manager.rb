@@ -503,7 +503,7 @@ module DownloadOrganization
 
     def season_dir_name()
       season = to_s_2_dig(@season)
-      return "Season#{season}"
+      return "Season.#{season}"
     end
 
     def episode_name()
