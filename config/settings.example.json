@@ -6,5 +6,6 @@
   "user_name": "foo",
   "password": "bar",
   "overwrite_files": false,
-  "delete_files": false
+  "delete_files": false,
+  "ignore_rars": true
 }
