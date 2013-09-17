@@ -5,6 +5,10 @@ The intention is to create a complete solution to automated identification of do
 
 To run this app first make sure you have rails and rubys setup on your server. Find a guide to setting up rails on your servers environment.
 
+Prerequisites:
+    
+    sudo apt-get install node
+
 Then clone the repository:
     
     cd /where/you/want/to/put/the/app
