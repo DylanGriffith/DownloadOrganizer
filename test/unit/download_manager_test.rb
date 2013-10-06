@@ -147,80 +147,92 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert_equal 1, result.final_match.episode
     assert_equal false, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01", result.final_match.episode_name
   end
 
   test "Double episode test 12x01x02" do
-    result = DownloadManager.match_file("path/The Simpsons 12x01x02.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons 12x01x02.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
   end
 
   test "Double episode test 12x01-02" do
-    result = DownloadManager.match_file("path/The Simpsons 12x01x02.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons 12x01x02.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
   end
 
   test "Double episode test 12x0102" do
-    result = DownloadManager.match_file("path/The Simpsons 12x0102.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons 12x0102.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
   end
 
   test "Double episode test S12E0102" do
-    result = DownloadManager.match_file("path/The Simpsons S12E0102.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons S12E0102.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
   end
 
   test "Double episode test S12E01-02" do
-    result = DownloadManager.match_file("path/The Simpsons s12e01-02.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons s12e01-02.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
   end
 
   test "Double episode test S12E01-E02" do
-    result = DownloadManager.match_file("path/The Simpsons s12e01-e02.mkv", false )
+    result = DownloadManager.match_file("path/The Simpsons s12e01-e02.mkv", true )
     assert_equal :episode, result.match_type
     assert_equal "The.Simpsons", result.final_match.title
     assert_equal 12, result.final_match.season
     assert_equal 1, result.final_match.episode
     assert_equal true, result.final_match.double_episode?
     assert_equal "The.Simpsons", result.final_match.show_dir_name
-    assert_equal "Season12", result.final_match.season_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
     assert_equal "The.Simpsons.S12E01E02", result.final_match.episode_name
+  end
+
+  test "Season name rather than double episode" do
+    result = DownloadManager.match_file("path/The.Simpsons.s12e01-e20/the.simpsons.s12e05.mkv", true )
+    assert_equal :episode, result.match_type
+    assert_equal "The.Simpsons", result.final_match.title
+    assert_equal 12, result.final_match.season
+    assert_equal 5, result.final_match.episode
+    assert_equal false, result.final_match.double_episode?
+    assert_equal "The.Simpsons", result.final_match.show_dir_name
+    assert_equal "Season.12", result.final_match.season_dir_name
+    assert_equal "The.Simpsons.S12E05", result.final_match.episode_name
   end
 
   # Movie Tests

@@ -313,14 +313,18 @@ module DownloadOrganization
       end
 
       # Match double episodes
-      double_episode_patterns = [ 'S(\d\d)E(\d\d)-?E?\d\d',
-                                 '(\d\d)x(\d\d)-?x?\d\d' ]
+      double_episode_patterns = [ 'S(\d\d)E(\d\d)-?E?(\d\d)',
+                                 '(\d\d)x(\d\d)-?x?(\d\d)' ]
       double_episode_patterns.each do |pattern|
         double_ep_show_regex = /#{match_late}(\w#{title_chars}+)#{pattern}/i
         if double_ep_show_regex.match( file_path )
-          result.match_type = :episode
-          result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, $3.to_i, true )
-          return result
+          start_ep_num = $3.to_i
+          end_ep_num = $4.to_i
+          if ( end_ep_num - start_ep_num == 1 )
+            result.match_type = :episode
+            result.final_match = Episode.get_episode_from_details( fix_title($1), $2.to_i, start_ep_num, true )
+            return result
+          end
         end
       end
 
@@ -521,7 +525,7 @@ module DownloadOrganization
       return new_episode
     end
 
-    private 
+    private
 
     def to_s_2_dig(num)
       num.to_s.rjust( 2, '0')
