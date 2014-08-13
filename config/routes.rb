@@ -1,6 +1,6 @@
 DownloadOrganizer::Application.routes.draw do
 
-  root :to => redirect('files/show')
+  root :to => redirect('/files/show')
 
   post "process/execute"
 
