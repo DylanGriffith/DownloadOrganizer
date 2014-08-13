@@ -1,5 +1,7 @@
 DownloadOrganizer::Application.routes.draw do
 
+  root :to => redirect('files#show')
+
   post "process/execute"
 
   post "files/process"
@@ -59,7 +61,6 @@ DownloadOrganizer::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
- root :to => 'files#show'
 
   # See how all your routes lay out with "rake routes"
 
