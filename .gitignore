@@ -21,8 +21,10 @@
 /config/database.yml
 
 # Ignore results of test
+test/resources/test3/shows/*
 test/resources/test4/shows/*
 test/resources/test4/movies/*
+test/resources/test5/shows/*
 
 # Ignore the staging directory
 staging/
