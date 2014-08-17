@@ -1,7 +1,6 @@
 require 'test_helper'
 require 'download_manager'
 require 'fileutils'
-include DownloadOrganization
 
 class DownloadManagerTest < ActiveSupport::TestCase
 
@@ -341,9 +340,6 @@ class DownloadManagerTest < ActiveSupport::TestCase
     result = DownloadManager.search_dir( downloads_dir )
     episode_matches = result.episode_matches
     movie_matches = result.movie_matches
-    ignored_files = result.ignored_files
-    unknown_files = result.unknown_files
-    items_with_matches = result.items_with_matches
 
     # Movie matches
     assert_equal 2, movie_matches.length
@@ -392,8 +388,6 @@ class DownloadManagerTest < ActiveSupport::TestCase
     result = DownloadManager.search_dir( downloads_dir )
     episode_matches = result.episode_matches
     movie_matches = result.movie_matches
-    ignored_files = result.ignored_files
-    unknown_files = result.unknown_files
     items_with_matches = result.items_with_matches
 
     assert_equal 1, movie_matches.length
@@ -424,8 +418,8 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert File.file?( File.join( movies_dir, "Jack.Reacher.(2013)", "Jack.Reacher.(2013).avi")), "Jack Reacher movie doesnt exist"
 
     assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
-    assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
-    assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season.05" )), "Hustle season 5 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season.05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
   end
 
   # Test processing directory with rars
@@ -451,8 +445,8 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).mkv")), "Willy Wonka movie doesnt exist"
 
     assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
-    assert File.directory?( File.join( shows_dir, "Hustle", "Season02" )), "Hustle season 2 folder doesnt exist"
-    assert File.file?( File.join( shows_dir, "Hustle", "Season02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season.02" )), "Hustle season 2 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season.02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"
   end
 
   # Test processing directory with rars
@@ -478,15 +472,15 @@ class DownloadManagerTest < ActiveSupport::TestCase
     assert File.file?( File.join( movies_dir, "Willy.Wonka.And.The.Chocolate.Factory.(1971)", "Willy.Wonka.And.The.Chocolate.Factory.(1971).mkv")), "Willy Wonka movie doesnt exist"
 
     assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
-    assert File.directory?( File.join( shows_dir, "Hustle", "Season02" )), "Hustle season 2 folder doesnt exist"
-    assert File.file?( File.join( shows_dir, "Hustle", "Season02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"    
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season.02" )), "Hustle season 2 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season.02", "Hustle.S02E05.mkv" )), "Hustle season 2 episode 5 doesnt exist"
 
     assert File.directory?( File.join( movies_dir, "Jack.Reacher.(2013)")), "Jack Reacher folder doesnt exist"
     assert File.file?( File.join( movies_dir, "Jack.Reacher.(2013)", "Jack.Reacher.(2013).avi")), "Jack Reacher movie doesnt exist"
 
     assert File.directory?( File.join( shows_dir, "Hustle" )), "Hustle folder doesnt exist"
-    assert File.directory?( File.join( shows_dir, "Hustle", "Season05" )), "Hustle season 5 folder doesnt exist"
-    assert File.file?( File.join( shows_dir, "Hustle", "Season05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
+    assert File.directory?( File.join( shows_dir, "Hustle", "Season.05" )), "Hustle season 5 folder doesnt exist"
+    assert File.file?( File.join( shows_dir, "Hustle", "Season.05", "Hustle.S05E02.avi" )), "Hustle season 5 episode 2 doesnt exist"
   end
 
   # Test processing multipart movies
